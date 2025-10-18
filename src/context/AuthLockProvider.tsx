@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, PanResponder } from 'react-native';
 import LockOverlay from '../components/LockOverlay';
 
 // import { hashPassword } from '../services/password';
@@ -32,7 +32,9 @@ export function AuthLockProvider({ children }: { children: React.ReactNode }) {
   // reset inactivity timer
   function resetTimer() {
     if (inactivityTimer.current) clearTimeout(inactivityTimer.current);
+    console.log('Resetting timer - will lock in', INACTIVITY_MS / 1000, 'seconds');
     inactivityTimer.current = setTimeout(() => {
+      console.log('Timer expired - locking app');
       lockNow();
     }, INACTIVITY_MS);
   }
@@ -149,14 +151,24 @@ function ActivityDetector({ children, onActivity }: { children: React.ReactNode;
 
 import { View, StyleSheet } from 'react-native';
 function ResponderWrapper({ children, onActivity }: { children: React.ReactNode; onActivity: () => void }) {
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false, // Don't capture touch events
+      onMoveShouldSetPanResponder: () => false, // Don't capture move events
+      onPanResponderTerminationRequest: () => true, // Allow other components to take over
+      onShouldBlockNativeResponder: () => false, // Don't block native responders
+      onStartShouldSetPanResponderCapture: () => {
+        // Only capture for activity detection, don't prevent other components
+        onActivity();
+        return false; // Don't actually capture the event
+      },
+    })
+  ).current;
+
   return (
     <View
       style={styles.flex}
-      onStartShouldSetResponder={() => true}
-      onResponderGrant={() => {
-        // user touched anywhere
-        onActivity();
-      }}
+      {...panResponder.panHandlers}
     >
       {children}
     </View>
