@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { useProductsByCategory, useDeleteProduct } from '../hooks/useProducts';
+import { useProductsByCategoryWithRedux, useDeleteProductWithRedux } from '../hooks/useProductsWithRedux';
 import { Product } from '../services/productsApi';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -37,8 +37,8 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isSuperAdmin = userRole === 'admin';
 
-  const { data, isLoading, error, refetch, isFetching } = useProductsByCategory(category, limit, 0);
-  const deleteProductMutation = useDeleteProduct();
+  const { products, isLoading, error, refetch, isFetching } = useProductsByCategoryWithRedux(category, limit, 0);
+  const deleteProductMutation = useDeleteProductWithRedux();
 
   // Check network status
   React.useEffect(() => {
@@ -51,7 +51,6 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
 
   // Memoize filtered products to prevent unnecessary re-renders
   const filteredProducts = useMemo(() => {
-    const products = data?.products || [];
     if (!searchQuery.trim()) return products;
 
     return products.filter(
@@ -59,7 +58,7 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-  }, [data?.products, searchQuery]);
+  }, [products, searchQuery]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -154,7 +153,7 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
     );
   }, [isFetching]);
 
-  if (isLoading && !data) {
+  if (isLoading && products.length === 0) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200EE" />

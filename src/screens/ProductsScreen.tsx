@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { useProducts, useDeleteProduct } from '../hooks/useProducts';
+import { useProductsWithRedux, useDeleteProductWithRedux } from '../hooks/useProductsWithRedux';
 import { Product } from '../services/productsApi';
 import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -30,8 +30,8 @@ const ProductsScreen: React.FC = () => {
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isSuperAdmin = userRole === 'admin';
 
-  const { data, isLoading, error, refetch, isFetching } = useProducts(limit, 0);
-  const deleteProductMutation = useDeleteProduct();
+  const { products, isLoading, error, refetch, isFetching, setSearchQuery: setReduxSearchQuery } = useProductsWithRedux(limit, 0);
+  const deleteProductMutation = useDeleteProductWithRedux();
 
   // Check network status
   React.useEffect(() => {
@@ -42,9 +42,13 @@ const ProductsScreen: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  // Sync local search query with Redux
+  React.useEffect(() => {
+    setReduxSearchQuery(searchQuery);
+  }, [searchQuery, setReduxSearchQuery]);
+
   // Memoize filtered products to prevent unnecessary re-renders
   const filteredProducts = useMemo(() => {
-    const products = data?.products || [];
     if (!searchQuery.trim()) return products;
 
     return products.filter(
@@ -52,7 +56,7 @@ const ProductsScreen: React.FC = () => {
         product.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase()),
     );
-  }, [data?.products, searchQuery]);
+  }, [products, searchQuery]);
 
   const handleRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -153,7 +157,7 @@ const ProductsScreen: React.FC = () => {
     );
   }, [isFetching]);
 
-  if (isLoading && !data) {
+  if (isLoading && products.length === 0) {
     return (
       <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color="#6200EE" />

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   TextInput,
 } from 'react-native';
-import { useCategories } from '../hooks/useProducts';
+import { useCategoriesWithRedux } from '../hooks/useProductsWithRedux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 
@@ -20,7 +20,7 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
   const [searchQuery, setSearchQuery] = useState('');
   const [isOffline, setIsOffline] = useState(false);
 
-  const { data: categories, isLoading, error, refetch } = useCategories();
+  const { categories, isLoading, error, refetch } = useCategoriesWithRedux();
 
   // Check network status
   React.useEffect(() => {
@@ -45,7 +45,7 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
     console.log('Categories array length:', categoriesArray.length);
     
     // Convert objects to strings for display and filtering
-    const categoryNames = categoriesArray.map(category => {
+    const categoryNames = categoriesArray.map((category: any) => {
       if (typeof category === 'string') {
         return category;
       }

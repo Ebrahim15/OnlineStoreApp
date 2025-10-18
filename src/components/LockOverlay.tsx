@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Modal, StyleSheet, Button } from 'react-native';
+import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
 
 type Props = {
   visible: boolean;
@@ -25,7 +25,9 @@ export default function LockOverlay({ visible, onAttemptBiometric }: Props) {
           <Text style={styles.title}>Locked</Text>
           <Text style={styles.subtitle}>Use biometrics or enter your password</Text>
           <View style={{ marginTop: 12 }}>
-            <Button title="Unlock" onPress={tryBiometric} />
+            <TouchableOpacity style={styles.unlockButton} onPress={tryBiometric}>
+              <Text style={styles.unlockButtonText}>Unlock</Text>
+            </TouchableOpacity>
           </View>
 
           {/* <View style={{ marginTop: 18 }}>
@@ -70,6 +72,19 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 20, fontWeight: '700' },
   subtitle: { marginTop: 8, color: '#555' },
+  unlockButton: {
+    backgroundColor: '#6200EE',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unlockButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ddd',
