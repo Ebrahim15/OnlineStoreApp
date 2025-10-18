@@ -6,7 +6,7 @@ A modern React Native e-commerce application built with TypeScript, featuring pr
 
 ### Core Features
 - **Product Catalog**: Browse and search through products with real-time filtering
-- **Category Management**: Organize products by categories with dedicated category screens
+- **Category Management**: Browse all available categories and select your desired category to view filtered products
 - **User Authentication**: Secure login with JWT tokens and biometric authentication
 - **Admin Panel**: Role-based access control with product management capabilities
 - **Offline Support**: Cached data with offline indicators and sync capabilities
@@ -179,8 +179,8 @@ User roles are determined by the `role` field in the user profile:
 ### Main Screens
 - **Login Screen**: Authentication with biometric support
 - **Products Screen**: Product catalog with search and filtering
-- **Category Selection**: Browse products by category
-- **Category Screen**: Category-specific product listings
+- **Category Selection Screen**: Browse and select from available product categories
+- **Category Screen**: View products filtered by your selected category
 
 ### Navigation Structure
 - **Stack Navigator**: Screen transitions and deep linking
@@ -197,6 +197,18 @@ API_BASE_URL=https://dummyjson.com
 BIOMETRIC_ENABLED=true
 AUTO_LOCK_TIMEOUT=10000
 ```
+
+### Test User Credentials
+
+#### Admin User (Full Access)
+- **Username**: `emilys`
+- **Password**: `emilyspass`
+- **Role**: Admin (can delete products)
+
+#### Regular User
+- **Username**: `jacksone`
+- **Password**: `jacksonepass`
+- **Role**: User (standard access)
 
 ### Build Configuration
 

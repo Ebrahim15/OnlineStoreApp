@@ -19,6 +19,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useNavigation } from '@react-navigation/native';
 import { useAppTheme } from '../hooks/useTheme';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 const ProductsScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -129,7 +130,7 @@ const ProductsScreen: React.FC = () => {
       <View style={styles.offlineBanner}>
         <Icon name="wifi-off" size={16} color="#fff" />
         <Text style={styles.offlineText}>
-          You're offline. Data may be outdated.
+          You're currently offline. Some features may not be available.
         </Text>
       </View>
     );
@@ -139,9 +140,11 @@ const ProductsScreen: React.FC = () => {
     () => (
       <View style={styles.emptyState}>
         <Icon name="cube-outline" size={64} color={colors.onSurfaceVariant} />
-        <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>No products found</Text>
+        <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>
+          {searchQuery ? 'No products found' : 'No products available'}
+        </Text>
         <Text style={[styles.emptyStateSubtext, { color: colors.onSurfaceVariant }]}>
-          {searchQuery ? 'Try adjusting your search' : 'Pull down to refresh'}
+          {searchQuery ? 'Try adjusting your search terms' : 'Pull down to refresh and load products'}
         </Text>
       </View>
     ),
@@ -172,9 +175,11 @@ const ProductsScreen: React.FC = () => {
     return (
       <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
         <Icon name="alert-circle-outline" size={64} color={colors.error} />
-        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load products</Text>
+        <Text style={[styles.errorText, { color: colors.error }]}>
+          {getUserFriendlyError(error, 'products')}
+        </Text>
         <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
-          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Try Again</Text>
         </TouchableOpacity>
       </View>
     );

@@ -5,7 +5,10 @@ export const authenticateBiometric = async (promptMessage?: string): Promise<boo
   try {
     const { available } = await rnBiometrics.isSensorAvailable();
 
-    if (!available) return false;
+    if (!available) {
+      console.log('Biometric authentication is not available on this device');
+      return false;
+    }
 
     const { success } = await rnBiometrics.simplePrompt({
       promptMessage: promptMessage ?? 'Unlock App'
@@ -13,7 +16,7 @@ export const authenticateBiometric = async (promptMessage?: string): Promise<boo
 
     return success;
   } catch (error) {
-    console.log('Biometric auth error:', error);
+    console.log('Biometric authentication failed:', error);
     return false;
   }
 };

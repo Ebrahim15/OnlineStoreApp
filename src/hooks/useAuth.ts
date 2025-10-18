@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import { login, getMe } from '../services/authApi';
 import { setCredentials, logout } from '../features/auth/authSlice';
 import { set, remove, get } from '../services/storage';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 export const useLogin = () => {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ export const useLogin = () => {
         // Invalidate and refetch user queries
         queryClient.invalidateQueries({ queryKey: ['user'] });
       } catch (error) {
-        console.error('Failed to fetch user details:', error);
+        console.error('Failed to fetch user details:', getUserFriendlyError(error, 'auth'));
         // If getMe fails, still set basic credentials but log the error
         dispatch(setCredentials({ 
           token: data.accessToken, 
@@ -42,7 +43,7 @@ export const useLogin = () => {
       }
     },
     onError: (error) => {
-      console.error('Login failed:', error);
+      console.error('Login failed:', getUserFriendlyError(error, 'auth'));
     },
   });
 };
@@ -73,7 +74,7 @@ export const useUser = (token: string | null) => {
 
   useEffect(() => {
     if (query.isError) {
-      console.error('Failed to fetch user data:', query.error);
+      console.error('Failed to fetch user data:', getUserFriendlyError(query.error, 'auth'));
       // Clear invalid token
       dispatch(logout());
       remove('token');

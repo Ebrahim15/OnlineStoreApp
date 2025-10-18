@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useAppTheme } from '../hooks/useTheme';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 interface CategoryScreenProps {
   route: {
@@ -168,9 +169,11 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
     return (
       <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
         <Icon name="alert-circle-outline" size={64} color={colors.error} />
-        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load {category} products</Text>
+        <Text style={[styles.errorText, { color: colors.error }]}>
+          {getUserFriendlyError(error, 'products')}
+        </Text>
         <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
-          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Try Again</Text>
         </TouchableOpacity>
       </View>
     );

@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useAppTheme } from '../hooks/useTheme';
 import { useLogin } from '../hooks/useAuth';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 
 export default function LoginScreen() {
@@ -48,7 +49,7 @@ export default function LoginScreen() {
       />
       {loginMutation.error ? (
         <Text style={[styles.error, { color: colors.error }]}>
-          {loginMutation.error.message || 'Invalid username or password'}
+          {getUserFriendlyError(loginMutation.error, 'auth')}
         </Text>
       ) : null}
       <Button

@@ -12,6 +12,7 @@ import { useCategoriesWithRedux } from '../hooks/useProductsWithRedux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
 import { useAppTheme } from '../hooks/useTheme';
+import { getUserFriendlyError } from '../utils/errorMessages';
 
 interface CategorySelectionScreenProps {
   navigation: any;
@@ -104,7 +105,7 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
       <View style={styles.offlineBanner}>
         <Icon name="wifi-off" size={16} color="#fff" />
         <Text style={styles.offlineText}>
-          You're offline. Data may be outdated.
+          You're currently offline. Some features may not be available.
         </Text>
       </View>
     );
@@ -113,9 +114,11 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
       <Icon name="folder-open-outline" size={64} color={colors.onSurfaceVariant} />
-      <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>No categories found</Text>
+      <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>
+        {searchQuery ? 'No categories found' : 'No categories available'}
+      </Text>
       <Text style={[styles.emptyStateSubtext, { color: colors.onSurfaceVariant }]}>
-        {searchQuery ? 'Try adjusting your search' : 'Pull down to refresh'}
+        {searchQuery ? 'Try adjusting your search terms' : 'Pull down to refresh and load categories'}
       </Text>
     </View>
   );
@@ -137,9 +140,11 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
     return (
       <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
         <Icon name="alert-circle-outline" size={64} color={colors.error} />
-        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load categories</Text>
+        <Text style={[styles.errorText, { color: colors.error }]}>
+          {getUserFriendlyError(error, 'categories')}
+        </Text>
         <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
-          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Try Again</Text>
         </TouchableOpacity>
       </View>
     );
