@@ -2,14 +2,6 @@
   "name": "OnlineStoreApp",
   "version": "0.0.1",
   "private": true,
-  "overrides": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "resolutions": {
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
