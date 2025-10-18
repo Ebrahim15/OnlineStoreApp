@@ -2,6 +2,14 @@
   "name": "OnlineStoreApp",
   "version": "0.0.1",
   "private": true,
+  "overrides": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "resolutions": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
@@ -13,7 +21,8 @@
     "test:coverage": "jest --coverage",
     "test:ci": "jest --ci --coverage --watchAll=false",
     "test:debug": "jest --detectOpenHandles --forceExit",
-    "test:update": "jest --updateSnapshot"
+    "test:update": "jest --updateSnapshot",
+    "clean-install": "powershell -ExecutionPolicy Bypass -File scripts/clean-install.ps1"
   },
   "dependencies": {
     "@react-native-community/netinfo": "^11.4.1",

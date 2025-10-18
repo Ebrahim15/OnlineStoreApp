@@ -324,6 +324,27 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🔧 Troubleshooting
 
+### GitHub Actions CI Issues
+
+If your GitHub Actions workflow fails during dependency installation:
+
+1. **Clean Install Locally**:
+   ```bash
+   npm run clean-install
+   ```
+
+2. **Manual Fix**:
+   ```bash
+   npm cache clean --force
+   rm -rf node_modules package-lock.json
+   npm install --legacy-peer-deps
+   ```
+
+3. **Common Issues**:
+   - **React 19 Compatibility**: The `.npmrc` file handles peer dependency conflicts
+   - **Node Version**: CI uses Node.js 20.x for compatibility
+   - **Cache Issues**: CI clears npm cache before installation
+
 ### Common Issues
 
 #### iOS Build Failures
