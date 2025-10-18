@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { get, remove } from "../services/storage";
-import { useAppDispatch, useAppSelector } from "../store/store";
-import { setCredentials, logout } from "../features/auth/authSlice";
+import { useAppSelector } from "../store/store";
 import LoginScreen from "../screens/LoginScreen";
-import { getMe } from "../services/authApi";
 import BottomTabs from "./BottomTabs";
 import CategorySelectionScreen from "../screens/CategorySelectionScreen";
 import CategoryScreen from "../screens/CategoryScreen";
+import { useColorScheme } from 'react-native';
+import { useAuthStatus } from '../hooks/useAuth';
+import { ActivityIndicator, View } from 'react-native';
+import { useAppTheme } from '../hooks/useTheme';
 
 export type RootStackParamList = {
   Home: undefined;
@@ -22,52 +23,54 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 export default function AppNavigator() {
   const { token } = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(true);
+  const isDarkMode = useColorScheme() === 'dark';
+  const { colors } = useAppTheme();
+  const { isLoading } = useAuthStatus();
 
-  useEffect(() => {
-    const restoreSession = async () => {
-      const savedToken = get("token");
-      if (savedToken) {
-        // const authenticated = await authenticateBiometric();
-        // if (!authenticated) {
-        //   dispatch(logout());
-        //   remove('token');
-        //   setLoading(false);
-        //   return;
-        // }
-        try {
-          const user = await getMe(savedToken);
-          dispatch(setCredentials({ token: savedToken, user }));
-        } catch {
-          dispatch(logout());
-          remove('token');
-        }
-      }
-      setLoading(false);
-    };
-    restoreSession();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const loadingStyle = {
+    flex: 1,
+    justifyContent: 'center' as const,
+    alignItems: 'center' as const,
+    backgroundColor: colors.background,
+  };
 
-  if (loading) return null;
+  if (isLoading) {
+    return (
+      <View style={loadingStyle}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator 
+      screenOptions={{ 
+        headerShown: false,
+        statusBarStyle: isDarkMode ? 'light' : 'dark',
+        statusBarBackgroundColor: isDarkMode ? '#121212' : '#f5f5f5',
+      }}
+    >
       {token ? (
         <>
           <Stack.Screen name="MainTabs" component={BottomTabs} />
           <Stack.Screen 
             name="CategorySelection" 
             component={CategorySelectionScreen}
-            options={{ headerShown: true, title: 'Categories' }}
+            options={{ 
+              headerShown: true, 
+              title: 'Categories',
+              statusBarStyle: isDarkMode ? 'light' : 'dark',
+              statusBarBackgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
+            }}
           />
           <Stack.Screen 
             name="Category" 
             component={CategoryScreen}
             options={({ route }) => ({ 
               headerShown: true, 
-              title: route.params.category.charAt(0).toUpperCase() + route.params.category.slice(1) + ' Products'
+              title: route.params.category.charAt(0).toUpperCase() + route.params.category.slice(1) + ' Products',
+              statusBarStyle: isDarkMode ? 'light' : 'dark',
+              statusBarBackgroundColor: isDarkMode ? '#1e1e1e' : '#ffffff',
             })}
           />
         </>

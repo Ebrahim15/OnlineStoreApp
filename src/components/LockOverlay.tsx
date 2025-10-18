@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity } from 'react-native';
+import { useAppTheme } from '../hooks/useTheme';
 
 type Props = {
   visible: boolean;
@@ -9,6 +10,7 @@ type Props = {
 
 export default function LockOverlay({ visible, onAttemptBiometric }: Props) {
 //   const [password, setPassword] = useState('');
+  const { colors } = useAppTheme();
 
   async function tryBiometric() {
     const ok = await onAttemptBiometric();
@@ -21,35 +23,14 @@ export default function LockOverlay({ visible, onAttemptBiometric }: Props) {
   return (
     <Modal visible={visible} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.backdrop}>
-        <View style={styles.card}>
-          <Text style={styles.title}>Locked</Text>
-          <Text style={styles.subtitle}>Use biometrics or enter your password</Text>
+        <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.title, { color: colors.onSurface }]}>Locked</Text>
+          <Text style={[styles.subtitle, { color: colors.onSurfaceVariant }]}>Unlock to continue using the app</Text>
           <View style={{ marginTop: 12 }}>
-            <TouchableOpacity style={styles.unlockButton} onPress={tryBiometric}>
-              <Text style={styles.unlockButtonText}>Unlock</Text>
+            <TouchableOpacity style={[styles.unlockButton, { backgroundColor: colors.primary }]} onPress={tryBiometric}>
+              <Text style={[styles.unlockButtonText, { color: colors.onPrimary }]}>Unlock</Text>
             </TouchableOpacity>
           </View>
-
-          {/* <View style={{ marginTop: 18 }}>
-            <TextInput
-              value={password}
-              onChangeText={setPassword}
-              placeholder="Fallback password"
-              secureTextEntry
-              style={styles.input}
-            />
-            <Button
-              title="Unlock with password"
-              onPress={async () => {
-                const ok = await onPasswordSubmit(password);
-                if (!ok) {
-                  Alert.alert('Wrong password');
-                } else {
-                  setPassword('');
-                }
-              }}
-            />
-          </View> */}
         </View>
       </View>
     </Modal>
@@ -65,15 +46,13 @@ const styles = StyleSheet.create({
   },
   card: {
     width: '86%',
-    backgroundColor: 'white',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
   },
   title: { fontSize: 20, fontWeight: '700' },
-  subtitle: { marginTop: 8, color: '#555' },
+  subtitle: { marginTop: 8 },
   unlockButton: {
-    backgroundColor: '#6200EE',
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
@@ -81,7 +60,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   unlockButtonText: {
-    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

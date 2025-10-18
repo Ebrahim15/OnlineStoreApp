@@ -8,9 +8,7 @@ import ProductsScreen from '../screens/ProductsScreen';
 
 import Icon from 'react-native-vector-icons/Ionicons';
 import { TouchableOpacity, TouchableOpacityProps } from 'react-native';
-import { logout } from '../features/auth/authSlice';
-import { useAppDispatch } from '../store/store';
-import { remove } from '../services/storage';
+import { useLogout } from '../hooks/useAuth';
 import { ParamListBase, RouteProp } from '@react-navigation/native';
 import LoginScreen from '../screens/LoginScreen';
 import CategorySelectionScreen from '../screens/CategorySelectionScreen';
@@ -18,11 +16,10 @@ import CategorySelectionScreen from '../screens/CategorySelectionScreen';
 const Tab = createBottomTabNavigator();
 
 export default function BottomTabs() {
-  const dispatch = useAppDispatch();
+  const logoutMutation = useLogout();
 
   const handleLogout = () => {
-    dispatch(logout());
-    remove('token');
+    logoutMutation.mutate();
   };
   const handleTabBarIcon = ({
     route,

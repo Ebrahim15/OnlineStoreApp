@@ -1,11 +1,14 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
-import { AppState, AppStateStatus, PanResponder } from 'react-native';
+import { AppState, AppStateStatus } from 'react-native';
 import LockOverlay from '../components/LockOverlay';
 
-// import { hashPassword } from '../services/password';
 import { useDispatch } from 'react-redux';
-import { logout, setCredentials } from '../features/auth/authSlice';
-import { getMe } from '../services/authApi';
+import { setCredentials } from '../features/auth/authSlice';
+import { useUser } from '../hooks/useAuth';
+import { get } from '../services/storage';
+import { authenticateBiometric } from '../services/biometrics';
+import { STORAGE_KEYS } from '../types';
+import ResponderWrapper from '../components/ResponderWrapper';
 
 const INACTIVITY_MS = 10000;
 
@@ -28,6 +31,8 @@ export function AuthLockProvider({ children }: { children: React.ReactNode }) {
   const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const appState = useRef<AppStateStatus>(AppState.currentState);
   const dispatch = useDispatch();
+  const token = get(STORAGE_KEYS.TOKEN) ?? null;
+  const { data: userData } = useUser(token);
 
   // reset inactivity timer
   function resetTimer() {
@@ -51,14 +56,12 @@ export function AuthLockProvider({ children }: { children: React.ReactNode }) {
       setLocked(false); // nothing to restore
       return;
     }
-    try {
-      const user = await getMe(token);
-      dispatch(setCredentials({ token, user }));
-    } catch {
-      // if token invalid, clear it
-      remove(STORAGE_KEYS.TOKEN);
-      dispatch(logout());
+    
+    // User data will be automatically fetched and set by useUser hook
+    if (userData) {
+      dispatch(setCredentials({ token, user: userData }));
     }
+    
     setLocked(false);
     resetTimer();
   }
@@ -136,12 +139,8 @@ export function AuthLockProvider({ children }: { children: React.ReactNode }) {
   );
 }
 
-/**
- * Utility small wrapper to capture global touch events and call onActivity.
- * Put this high in tree (inside provider, around NavigationContainer)
- */
+
 function ActivityDetector({ children, onActivity }: { children: React.ReactNode; onActivity: () => void }) {
-  // Simple approach: use onStartShouldSetResponder on a view that covers entire app
   return (
     <ResponderWrapper onActivity={onActivity}>
       {children}
@@ -149,35 +148,29 @@ function ActivityDetector({ children, onActivity }: { children: React.ReactNode;
   );
 }
 
-import { View, StyleSheet } from 'react-native';
-function ResponderWrapper({ children, onActivity }: { children: React.ReactNode; onActivity: () => void }) {
-  const panResponder = useRef(
-    PanResponder.create({
-      onStartShouldSetPanResponder: () => false, // Don't capture touch events
-      onMoveShouldSetPanResponder: () => false, // Don't capture move events
-      onPanResponderTerminationRequest: () => true, // Allow other components to take over
-      onShouldBlockNativeResponder: () => false, // Don't block native responders
-      onStartShouldSetPanResponderCapture: () => {
-        // Only capture for activity detection, don't prevent other components
-        onActivity();
-        return false; // Don't actually capture the event
-      },
-    })
-  ).current;
+// import { View, StyleSheet } from 'react-native';
+// function ResponderWrapper({ children, onActivity }: { children: React.ReactNode; onActivity: () => void }) {
+//   const panResponder = useRef(
+//     PanResponder.create({
+//       onStartShouldSetPanResponder: () => false, // Don't capture touch events
+//       onMoveShouldSetPanResponder: () => false, // Don't capture move events
+//       onPanResponderTerminationRequest: () => true, // Allow other components to take over
+//       onShouldBlockNativeResponder: () => false, // Don't block native responders
+//       onStartShouldSetPanResponderCapture: () => {
+//         // Only capture for activity detection, don't prevent other components
+//         onActivity();
+//         return false; // Don't actually capture the event
+//       },
+//     })
+//   ).current;
 
-  return (
-    <View
-      style={styles.flex}
-      {...panResponder.panHandlers}
-    >
-      {children}
-    </View>
-  );
-}
-const styles = StyleSheet.create({ flex: { flex: 1 } });
-
-// small storage setter wrapper to avoid circular import above
-import { get, remove } from '../services/storage';
-import { STORAGE_KEYS } from '../types';
-import { authenticateBiometric } from '../services/biometrics';
-
+//   return (
+//     <View
+//       style={styles.flex}
+//       {...panResponder.panHandlers}
+//     >
+//       {children}
+//     </View>
+//   );
+// }
+// const styles = StyleSheet.create({ flex: { flex: 1 } });

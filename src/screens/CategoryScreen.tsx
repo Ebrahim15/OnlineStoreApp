@@ -17,6 +17,7 @@ import NetInfo from '@react-native-community/netinfo';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
+import { useAppTheme } from '../hooks/useTheme';
 
 interface CategoryScreenProps {
   route: {
@@ -36,6 +37,7 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
   // Get user role from Redux store
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isSuperAdmin = userRole === 'admin';
+  const { colors } = useAppTheme();
 
   const { products, isLoading, error, refetch, isFetching } = useProductsByCategoryWithRedux(category, limit, 0);
   const deleteProductMutation = useDeleteProductWithRedux();
@@ -93,27 +95,27 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
 
   const renderProduct = useCallback(
     ({ item }: { item: Product }) => (
-      <View style={styles.productCard}>
+      <View style={[styles.productCard, { backgroundColor: colors.surface, shadowColor: colors.shadow }]}>
         <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
         <View style={styles.productInfo}>
-          <Text style={styles.productTitle} numberOfLines={2}>
+          <Text style={[styles.productTitle, { color: colors.onSurface }]} numberOfLines={2}>
             {item.title}
           </Text>
-          <Text style={styles.productPrice}>${item.price}</Text>
-          <Text style={styles.productCategory}>{item.category}</Text>
+          <Text style={[styles.productPrice, { color: colors.primary }]}>${item.price}</Text>
+          <Text style={[styles.productCategory, { color: colors.onSurfaceVariant }]}>{item.category}</Text>
           {isSuperAdmin && (
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDeleteProduct(item)}
             >
-              <Icon name="trash-outline" size={20} color="#ff4444" />
-              <Text style={styles.deleteButtonText}>Delete</Text>
+              <Icon name="trash-outline" size={20} color={colors.error} />
+              <Text style={[styles.deleteButtonText, { color: colors.error }]}>Delete</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
     ),
-    [isSuperAdmin, handleDeleteProduct],
+    [isSuperAdmin, handleDeleteProduct, colors],
   );
 
   const renderOfflineBanner = useCallback(() => {
@@ -132,14 +134,14 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
   const renderEmptyState = useCallback(
     () => (
       <View style={styles.emptyState}>
-        <Icon name="cube-outline" size={64} color="#ccc" />
-        <Text style={styles.emptyStateText}>No products found</Text>
-        <Text style={styles.emptyStateSubtext}>
+        <Icon name="cube-outline" size={64} color={colors.onSurfaceVariant} />
+        <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>No products found</Text>
+        <Text style={[styles.emptyStateSubtext, { color: colors.onSurfaceVariant }]}>
           {searchQuery ? 'Try adjusting your search' : 'Pull down to refresh'}
         </Text>
       </View>
     ),
-    [searchQuery],
+    [searchQuery, colors],
   );
 
   const renderFooter = useCallback(() => {
@@ -147,51 +149,51 @@ const CategoryScreen: React.FC<CategoryScreenProps> = ({ route }) => {
 
     return (
       <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color="#6200EE" />
-        <Text style={styles.footerText}>Loading more products...</Text>
+        <ActivityIndicator size="small" color={colors.primary} />
+        <Text style={[styles.footerText, { color: colors.onSurfaceVariant }]}>Loading more products...</Text>
       </View>
     );
-  }, [isFetching]);
+  }, [isFetching, colors]);
 
   if (isLoading && products.length === 0) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6200EE" />
-        <Text style={styles.loadingText}>Loading {category} products...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.onSurfaceVariant }]}>Loading {category} products...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Icon name="alert-circle-outline" size={64} color="#ff4444" />
-        <Text style={styles.errorText}>Failed to load {category} products</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+        <Icon name="alert-circle-outline" size={64} color={colors.error} />
+        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load {category} products</Text>
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderOfflineBanner()}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{category.charAt(0).toUpperCase() + category.slice(1)} Products</Text>
-        <View style={styles.searchContainer}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.outline }]}>
+        <Text style={[styles.headerTitle, { color: colors.onSurface }]}>{category.charAt(0).toUpperCase() + category.slice(1)} Products</Text>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surfaceVariant }]}>
           <Icon
             name="search"
             size={20}
-            color="#666"
+            color={colors.onSurfaceVariant}
             style={styles.searchIcon}
           />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.onSurface }]}
             placeholder={`Search ${category} products...`}
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.onSurfaceVariant}
             autoCorrect={false}
             autoCapitalize="none"
             returnKeyType="search"

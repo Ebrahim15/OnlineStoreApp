@@ -1,53 +1,28 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import { login, getMe } from '../services/authApi';
-import { set } from '../services/storage';
-import { setCredentials } from '../features/auth/authSlice';
-import { useAppDispatch } from '../store/store';
-import { AuthResponse } from '../types/api';
+import { useAppTheme } from '../hooks/useTheme';
+import { useLogin } from '../hooks/useAuth';
 
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const dispatch = useAppDispatch();
+  const { colors } = useAppTheme();
+  const loginMutation = useLogin();
 
-  const handleLogin = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      if (!username || !password) {
-        setError('Please enter a username and password');
-        return;
-      }
-      const data: AuthResponse = await login(username, password);
-      
-      // Store token first
-      set('token', data.accessToken);
-      
-      // Fetch user details with role information
-      const userDetails = await getMe(data.accessToken);
-      
-      // Dispatch with complete user information including role
-      dispatch(setCredentials({ 
-        token: data.accessToken, 
-        user: userDetails 
-      }));
-    } catch (err) {
-      console.error(err);
-      setError('Invalid username or password');
-    } finally {
-      setLoading(false);
+  const handleLogin = () => {
+    if (!username || !password) {
+      return;
     }
+    
+    loginMutation.mutate({ username, password });
   };
 
   return (
-    <View style={styles.container}>
-      <Text variant="headlineMedium" style={styles.title}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Text variant="headlineMedium" style={[styles.title, { color: colors.onBackground }]}>
         Login
       </Text>
       <TextInput
@@ -71,11 +46,16 @@ export default function LoginScreen() {
           />
         }
       />
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {loginMutation.error ? (
+        <Text style={[styles.error, { color: colors.error }]}>
+          {loginMutation.error.message || 'Invalid username or password'}
+        </Text>
+      ) : null}
       <Button
         mode="contained"
         onPress={handleLogin}
-        loading={loading}
+        loading={loginMutation.isPending}
+        disabled={!username || !password}
         style={styles.button}
       >
         Sign In
@@ -89,24 +69,19 @@ const styles = StyleSheet.create({
     flex: 1, 
     justifyContent: 'center', 
     padding: 24,
-    backgroundColor: '#f5f5f5',
   },
   title: { 
     textAlign: 'center', 
     marginBottom: 32,
-    color: '#333',
     fontWeight: 'bold',
   },
   input: { 
     marginBottom: 16,
-    backgroundColor: '#fff',
   },
   button: { 
     marginTop: 16,
-    backgroundColor: '#6200EE',
   },
   error: { 
-    color: '#ff4444', 
     textAlign: 'center', 
     marginBottom: 16,
     fontSize: 14,

@@ -11,6 +11,7 @@ import {
 import { useCategoriesWithRedux } from '../hooks/useProductsWithRedux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import NetInfo from '@react-native-community/netinfo';
+import { useAppTheme } from '../hooks/useTheme';
 
 interface CategorySelectionScreenProps {
   navigation: any;
@@ -19,6 +20,7 @@ interface CategorySelectionScreenProps {
 const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navigation }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isOffline, setIsOffline] = useState(false);
+  const { colors } = useAppTheme();
 
   const { categories, isLoading, error, refetch } = useCategoriesWithRedux();
 
@@ -83,17 +85,17 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
     
     return (
       <TouchableOpacity
-        style={styles.categoryCard}
+        style={[styles.categoryCard, { backgroundColor: colors.surface, shadowColor: colors.shadow }]}
         onPress={() => handleCategorySelect(item)}
       >
         <View style={styles.categoryContent}>
-          <Icon name="folder-outline" size={24} color="#6200EE" />
-          <Text style={styles.categoryName}>{item.charAt(0).toUpperCase() + item.slice(1)}</Text>
-          <Icon name="chevron-forward" size={20} color="#666" />
+          <Icon name="folder-outline" size={24} color={colors.primary} />
+          <Text style={[styles.categoryName, { color: colors.onSurface }]}>{item.charAt(0).toUpperCase() + item.slice(1)}</Text>
+          <Icon name="chevron-forward" size={20} color={colors.onSurfaceVariant} />
         </View>
       </TouchableOpacity>
     );
-  }, [handleCategorySelect]);
+  }, [handleCategorySelect, colors]);
 
   const renderOfflineBanner = () => {
     if (!isOffline) return null;
@@ -110,9 +112,9 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
 
   const renderEmptyState = () => (
     <View style={styles.emptyState}>
-      <Icon name="folder-open-outline" size={64} color="#ccc" />
-      <Text style={styles.emptyStateText}>No categories found</Text>
-      <Text style={styles.emptyStateSubtext}>
+      <Icon name="folder-open-outline" size={64} color={colors.onSurfaceVariant} />
+      <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>No categories found</Text>
+      <Text style={[styles.emptyStateSubtext, { color: colors.onSurfaceVariant }]}>
         {searchQuery ? 'Try adjusting your search' : 'Pull down to refresh'}
       </Text>
     </View>
@@ -123,9 +125,9 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
   if (isLoading) {
     console.log('Showing loading state');
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6200EE" />
-        <Text style={styles.loadingText}>Loading categories...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.onSurfaceVariant }]}>Loading categories...</Text>
       </View>
     );
   }
@@ -133,29 +135,29 @@ const CategorySelectionScreen: React.FC<CategorySelectionScreenProps> = ({ navig
   if (error) {
     console.log('Showing error state:', error);
     return (
-      <View style={styles.errorContainer}>
-        <Icon name="alert-circle-outline" size={64} color="#ff4444" />
-        <Text style={styles.errorText}>Failed to load categories</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+        <Icon name="alert-circle-outline" size={64} color={colors.error} />
+        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load categories</Text>
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderOfflineBanner()}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Categories</Text>
-        <View style={styles.searchContainer}>
-          <Icon name="search" size={20} color="#666" style={styles.searchIcon} />
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.outline }]}>
+        <Text style={[styles.headerTitle, { color: colors.onSurface }]}>Categories</Text>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surfaceVariant }]}>
+          <Icon name="search" size={20} color={colors.onSurfaceVariant} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.onSurface }]}
             placeholder="Search categories..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.onSurfaceVariant}
             autoCorrect={false}
             autoCapitalize="none"
             returnKeyType="search"

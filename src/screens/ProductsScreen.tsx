@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { useSelector } from 'react-redux';
 import { RootState } from '../store/store';
 import { useNavigation } from '@react-navigation/native';
+import { useAppTheme } from '../hooks/useTheme';
 
 const ProductsScreen: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
@@ -29,6 +30,7 @@ const ProductsScreen: React.FC = () => {
   // Get user role from Redux store
   const userRole = useSelector((state: RootState) => state.auth.user?.role);
   const isSuperAdmin = userRole === 'admin';
+  const { colors } = useAppTheme();
 
   const { products, isLoading, error, refetch, isFetching, setSearchQuery: setReduxSearchQuery } = useProductsWithRedux(limit, 0);
   const deleteProductMutation = useDeleteProductWithRedux();
@@ -91,27 +93,27 @@ const ProductsScreen: React.FC = () => {
 
   const renderProduct = useCallback(
     ({ item }: { item: Product }) => (
-      <View style={styles.productCard}>
+      <View style={[styles.productCard, { backgroundColor: colors.surface, shadowColor: colors.shadow }]}>
         <Image source={{ uri: item.thumbnail }} style={styles.thumbnail} />
         <View style={styles.productInfo}>
-          <Text style={styles.productTitle} numberOfLines={2}>
+          <Text style={[styles.productTitle, { color: colors.onSurface }]} numberOfLines={2}>
             {item.title}
           </Text>
-          <Text style={styles.productPrice}>${item.price}</Text>
-          <Text style={styles.productCategory}>{item.category}</Text>
+          <Text style={[styles.productPrice, { color: colors.primary }]}>${item.price}</Text>
+          <Text style={[styles.productCategory, { color: colors.onSurfaceVariant }]}>{item.category}</Text>
           {isSuperAdmin && (
             <TouchableOpacity
               style={styles.deleteButton}
               onPress={() => handleDeleteProduct(item)}
             >
-              <Icon name="trash-outline" size={20} color="#ff4444" />
-              <Text style={styles.deleteButtonText}>Delete</Text>
+              <Icon name="trash-outline" size={20} color={colors.error} />
+              <Text style={[styles.deleteButtonText, { color: colors.error }]}>Delete</Text>
             </TouchableOpacity>
           )}
         </View>
       </View>
     ),
-    [isSuperAdmin, handleDeleteProduct],
+    [isSuperAdmin, handleDeleteProduct, colors],
   );
 
   //   const renderHeader = useCallback(() => (
@@ -136,14 +138,14 @@ const ProductsScreen: React.FC = () => {
   const renderEmptyState = useCallback(
     () => (
       <View style={styles.emptyState}>
-        <Icon name="cube-outline" size={64} color="#ccc" />
-        <Text style={styles.emptyStateText}>No products found</Text>
-        <Text style={styles.emptyStateSubtext}>
+        <Icon name="cube-outline" size={64} color={colors.onSurfaceVariant} />
+        <Text style={[styles.emptyStateText, { color: colors.onSurfaceVariant }]}>No products found</Text>
+        <Text style={[styles.emptyStateSubtext, { color: colors.onSurfaceVariant }]}>
           {searchQuery ? 'Try adjusting your search' : 'Pull down to refresh'}
         </Text>
       </View>
     ),
-    [searchQuery],
+    [searchQuery, colors],
   );
 
   const renderFooter = useCallback(() => {
@@ -151,60 +153,60 @@ const ProductsScreen: React.FC = () => {
 
     return (
       <View style={styles.footerLoader}>
-        <ActivityIndicator size="small" color="#6200EE" />
-        <Text style={styles.footerText}>Loading more products...</Text>
+        <ActivityIndicator size="small" color={colors.primary} />
+        <Text style={[styles.footerText, { color: colors.onSurfaceVariant }]}>Loading more products...</Text>
       </View>
     );
-  }, [isFetching]);
+  }, [isFetching, colors]);
 
   if (isLoading && products.length === 0) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#6200EE" />
-        <Text style={styles.loadingText}>Loading products...</Text>
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+        <Text style={[styles.loadingText, { color: colors.onSurfaceVariant }]}>Loading products...</Text>
       </View>
     );
   }
 
   if (error) {
     return (
-      <View style={styles.errorContainer}>
-        <Icon name="alert-circle-outline" size={64} color="#ff4444" />
-        <Text style={styles.errorText}>Failed to load products</Text>
-        <TouchableOpacity style={styles.retryButton} onPress={() => refetch()}>
-          <Text style={styles.retryButtonText}>Retry</Text>
+      <View style={[styles.errorContainer, { backgroundColor: colors.background }]}>
+        <Icon name="alert-circle-outline" size={64} color={colors.error} />
+        <Text style={[styles.errorText, { color: colors.error }]}>Failed to load products</Text>
+        <TouchableOpacity style={[styles.retryButton, { backgroundColor: colors.primary }]} onPress={() => refetch()}>
+          <Text style={[styles.retryButtonText, { color: colors.onPrimary }]}>Retry</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {renderOfflineBanner()}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.outline }]}>
         <View style={styles.headerTop}>
-          <Text style={styles.headerTitle}>All Products</Text>
+          <Text style={[styles.headerTitle, { color: colors.onSurface }]}>All Products</Text>
           <TouchableOpacity
             style={styles.categoriesButton}
             onPress={() => navigation.navigate('CategorySelection' as never)}
           >
-            <Icon name="grid-outline" size={20} color="#6200EE" />
-            <Text style={styles.categoriesButtonText}>Categories</Text>
+            <Icon name="grid-outline" size={20} color={colors.primary} />
+            <Text style={[styles.categoriesButtonText, { color: colors.primary }]}>Categories</Text>
           </TouchableOpacity>
         </View>
-        <View style={styles.searchContainer}>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surfaceVariant }]}>
           <Icon
             name="search"
             size={20}
-            color="#666"
+            color={colors.onSurfaceVariant}
             style={styles.searchIcon}
           />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.onSurface }]}
             placeholder="Search products..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#666"
+            placeholderTextColor={colors.onSurfaceVariant}
             autoCorrect={false}
             autoCapitalize="none"
             returnKeyType="search"
