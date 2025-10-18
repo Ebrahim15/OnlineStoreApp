@@ -20,9 +20,8 @@ A modern React Native e-commerce application built with TypeScript, featuring pr
 - **Auto-lock Security**: Configurable inactivity timeout with biometric unlock
 
 ### Admin Features
-- **Product Management**: Add, edit, and delete products (admin role required)
+- **Product Management**: Delete products (admin role required)
 - **User Role Management**: Different permission levels for users and admins
-- **Analytics Dashboard**: Product statistics and user activity (planned)
 
 ## 🛠️ Technology Stack
 
@@ -85,6 +84,8 @@ npm install
 
 ### 3. iOS Setup (macOS only)
 
+**⚠️ Important**: iOS development requires CocoaPods installation. Skip this step only if you're developing exclusively for Android.
+
 Install CocoaPods dependencies:
 
 ```bash
@@ -92,6 +93,8 @@ cd ios
 pod install
 cd ..
 ```
+
+**Note**: If you skip this step, the app will work on Android but will fail to build/run on iOS devices and simulators.
 
 ### 4. Start Metro Bundler
 
@@ -160,15 +163,11 @@ The app implements a comprehensive theming system with:
 ### Regular Users
 - Browse products and categories
 - Search and filter products
-- View product details
 - Access offline cached data
 
 ### Admin Users
 - All regular user permissions
-- **Product Management**: Add, edit, delete products
-- **User Management**: View and manage user accounts
-- **Analytics Access**: View sales and user statistics
-- **System Settings**: Configure app preferences
+- **Product Management**: delete products
 
 ### Role Assignment
 User roles are determined by the `role` field in the user profile:
@@ -182,7 +181,6 @@ User roles are determined by the `role` field in the user profile:
 - **Products Screen**: Product catalog with search and filtering
 - **Category Selection**: Browse products by category
 - **Category Screen**: Category-specific product listings
-- **Profile Screen**: User settings and preferences
 
 ### Navigation Structure
 - **Stack Navigator**: Screen transitions and deep linking
@@ -285,19 +283,6 @@ AUTO_LOCK_TIMEOUT=10000
 4. **Analytics**: User behavior tracking and business intelligence
 5. **Multi-language Support**: Internationalization and localization
 
-### Long-term Vision (3-6 months)
-1. **AI Recommendations**: Machine learning-based product suggestions
-2. **AR Features**: Augmented reality product visualization
-3. **Voice Search**: Voice-activated product search
-4. **Progressive Web App**: Web version with offline capabilities
-5. **Microservices Architecture**: Scalable backend with microservices
-
-### Technical Debt & Refactoring
-1. **Component Library**: Extract reusable components into a design system
-2. **Performance Monitoring**: Implement crash reporting and performance analytics
-3. **Accessibility**: Full WCAG compliance and screen reader support
-4. **Security Audit**: Comprehensive security review and penetration testing
-5. **Documentation**: API documentation and developer guides
 
 ## 🤝 Contributing
 
@@ -325,12 +310,51 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Material Design](https://material.io) for design guidelines
 - All open-source contributors who made this project possible
 
+## 🔧 Troubleshooting
+
+### Common Issues
+
+#### iOS Build Failures
+**Problem**: App fails to build/run on iOS
+**Solution**: Run `pod install` in the `ios` directory
+```bash
+cd ios
+pod install
+cd ..
+```
+
+#### Missing Native Modules (iOS)
+**Problem**: "Module not found" errors on iOS
+**Solution**: Ensure CocoaPods dependencies are installed
+```bash
+cd ios
+pod install --repo-update
+cd ..
+```
+
+#### Android Build Issues
+**Problem**: Gradle build failures
+**Solution**: Clean and rebuild
+```bash
+cd android
+./gradlew clean
+cd ..
+npm run android
+```
+
+#### Metro Bundler Issues
+**Problem**: Metro server won't start
+**Solution**: Clear cache and restart
+```bash
+npm start -- --reset-cache
+```
+
 ## 📞 Support
 
 For support and questions:
 - Create an issue in the repository
 - Check the [documentation](docs/)
-- Review the [troubleshooting guide](docs/troubleshooting.md)
+- Review the troubleshooting section above
 
 ---
 
